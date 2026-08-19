@@ -2,5 +2,5 @@
 // 예: https://script.google.com/macros/s/AKfycbx.../exec
 // 설정 방법은 README.md의 "3. Apps Script 배포" 참고
 const CONFIG = {
-  API_URL: 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'
+  API_URL: 'https://script.google.com/macros/s/AKfycbxVe9ulY_-ymlUjnsgvgGg3dwZZIDI9QH26Mb2bAvNasQol_ZSZUOCBLVDO238338_Y/exec'
 };
