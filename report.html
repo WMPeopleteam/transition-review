@@ -452,7 +452,7 @@ function roleLabel(role) { return ROLE_LABELS[role] || role; }
 // 예: https://script.google.com/macros/s/AKfycbx.../exec
 // 설정 방법은 README.md의 "3. Apps Script 배포" 참고
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbxVe9ulY_-ymlUjnsgvgGg3dwZZIDI9QH26Mb2bAvNasQol_ZSZUOCBLVDO238338_Y/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbxkkDaq71UOUSsAshBYAifScXbHDoETOLmK039qbiHaPrtvZeu62kumnXWl1IcyLQos/exec'
 };
 
 // 제출/수정 마감 시각 (서버(Code.gs)의 SUBMIT_DEADLINE과 반드시 동일하게 유지)
@@ -572,7 +572,7 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
         const risk = rec['위험요인_JSON'] || {};
         const entry = risk[idx];
         if (entry && entry.level && entry.level !== '해당없음') {
-          rows.push(`<tr><td>${escapeHtml(item)}</td><td>${roleLabel(role)}</td><td>${entry.level}</td><td class="text-cell">${escapeHtml(entry.detail || '')}</td></tr>`);
+          rows.push(`<tr><td>${escapeHtml(item)}</td><td>${roleLabel(role)}</td><td>${escapeHtml(entry.level)}</td><td class="text-cell">${escapeHtml(entry.detail || '')}</td></tr>`);
         }
       });
     });
