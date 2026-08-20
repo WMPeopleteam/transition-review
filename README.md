@@ -7,15 +7,16 @@
 ## 구조
 
 ```
-index.html    평가자 화면 (사번 로그인 → 배정 목록 → 평가서 작성)
-admin.html    관리자 화면 (접속코드 로그인 → 진행 현황 → 리포트/엑셀)
-report.html   인턴 1명에 대한 4인 평가 종합 리포트 (인쇄/PDF 저장 가능, 1~2쪽)
-app.js / admin.js / report.js   각 화면 로직
-rubric.js     평가 문항(5개 영역, 4점 척도 행동기준) — 개인정보 없음, 공개 저장소에 안전
-style.css     공통 디자인
-config.js     Apps Script 배포 URL을 넣는 설정 파일
+index.html    평가자 화면 (사번 로그인 → 배정 목록 → 평가서 작성) — 화면/문항/로직이 모두 이 한 파일 안에 포함
+admin.html    관리자 화면 (접속코드 로그인 → 진행 현황 → 리포트/엑셀) — 화면/로직 모두 포함
+report.html   인턴 1명에 대한 4인 평가 종합 리포트 (인쇄/PDF 저장 가능, 1~2쪽) — 화면/로직 모두 포함
 apps-script/Code.gs   백엔드(Google Apps Script) 코드
 ```
+
+세 html 파일은 각각 CSS·JS·평가 문항 데이터가 모두 하나의 파일 안에 포함된 **독립 실행형(self-contained)** 구조입니다.
+(참고하신 `wmpeopleteam.github.io/recruitment`와 같은 방식) 세 파일에 평가 문항 데이터(rubric)가
+각각 중복 포함되어 있는데, 문항을 수정할 때는 세 파일 모두에서 같은 부분을 고쳐야 합니다
+(`// ==== rubric.js ====` 주석으로 표시해둔 구간).
 
 **왜 이런 구조인가**: GitHub Pages는 정적 파일만 서빙하는 공개 사이트입니다. 사번·이름·평가결과 같은
 개인정보를 여기 직접 올리면 저장소를 보는 누구나 볼 수 있습니다. 그래서 이름/사번/평가결과는
@@ -50,13 +51,19 @@ apps-script/Code.gs   백엔드(Google Apps Script) 코드
 
 ## 3. 사이트에 연결
 
-`config.js` 파일을 열어 아래처럼 수정합니다.
+`index.html`, `admin.html`, `report.html` **세 파일 모두에서** `// ==== config.js ====` 주석
+바로 아래에 있는 CONFIG 블록을 찾아 API_URL 값을 수정합니다. (파일이 하나로 합쳐져 있어
+세 곳 모두 고쳐야 합니다 — 하나라도 빠뜨리면 그 화면만 "서버 연결이 설정되지 않았습니다"
+경고가 뜹니다.)
 
 ```js
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/여기에-배포-URL/exec'
 };
 ```
+
+각 파일에서 Ctrl+F(또는 Cmd+F)로 `PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE` 를 검색하면
+바로 찾을 수 있습니다.
 
 ## 4. GitHub에 올리기
 
