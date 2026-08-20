@@ -207,12 +207,16 @@ textarea { resize: vertical; min-height: 70px; }
 .note-field { margin-top: 10px; }
 .note-field label { font-size: 12.5px; color: var(--muted); display: block; margin-bottom: 4px; }
 
-.risk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.risk-table th, .risk-table td { border-bottom: 1px solid var(--line); padding: 10px 6px; text-align: left; vertical-align: top; }
+.risk-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+.risk-table th, .risk-table td { border-bottom: 1px solid var(--line); padding: 10px 6px; text-align: left; vertical-align: top; word-break: keep-all; overflow-wrap: break-word; }
 .risk-table th { color: var(--muted); font-weight: 600; font-size: 12px; }
-.risk-radio-group { display: flex; gap: 12px; }
+.risk-radio-group { display: flex; flex-direction: column; gap: 6px; }
 .risk-radio-group label { display: flex; align-items: center; gap: 4px; font-size: 12.5px; white-space: nowrap; }
-.risk-detail { width: 100%; }
+.risk-detail { width: 100%; min-height: 40px; resize: vertical; font-family: inherit; }
+
+.risk-crit-tag { display: inline-block; font-weight: 700; font-size: 11px; padding: 1px 7px; border-radius: 20px; margin-right: 5px; white-space: nowrap; }
+.risk-crit-tag.warn { background: #fdf1e0; color: var(--warn); }
+.risk-crit-tag.bad { background: #fdeceb; color: var(--bad); }
 
 .field-row { margin-bottom: 16px; }
 .field-row label.field-label { display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; }
@@ -460,6 +464,7 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
   let state = {
     sabun: sessionStorage.getItem('tr_sabun') || '',
     evaluatorName: sessionStorage.getItem('tr_name') || '',
+    sessionToken: sessionStorage.getItem('tr_session') || '',
     assignments: [],
     view: 'login' // login | dashboard | form
   };
@@ -498,7 +503,8 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
   function logout() {
     sessionStorage.removeItem('tr_sabun');
     sessionStorage.removeItem('tr_name');
-    state = { sabun: '', evaluatorName: '', assignments: [], view: 'login' };
+    sessionStorage.removeItem('tr_session');
+    state = { sabun: '', evaluatorName: '', sessionToken: '', assignments: [], view: 'login' };
     render();
   }
 
@@ -572,10 +578,12 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
       if (!res.ok) { errEl.textContent = res.error || '인증에 실패했습니다.'; return; }
       state.sabun = res.sabun;
       state.evaluatorName = res.evaluatorName;
+      state.sessionToken = res.sessionToken;
       state.assignments = res.assignments;
       state.view = 'dashboard';
       sessionStorage.setItem('tr_sabun', state.sabun);
       sessionStorage.setItem('tr_name', state.evaluatorName);
+      sessionStorage.setItem('tr_session', state.sessionToken);
       render();
     }).catch(() => {
       btn.disabled = false;
@@ -655,10 +663,12 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
       if (!res.ok) { errEl.textContent = res.error || '인증에 실패했습니다.'; return; }
       state.sabun = res.sabun;
       state.evaluatorName = res.evaluatorName;
+      state.sessionToken = res.sessionToken;
       state.assignments = res.assignments;
       state.view = 'dashboard';
       sessionStorage.setItem('tr_sabun', state.sabun);
       sessionStorage.setItem('tr_name', state.evaluatorName);
+      sessionStorage.setItem('tr_session', state.sessionToken);
       render();
     }).catch(() => {
       btn.disabled = false;
@@ -669,7 +679,7 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
 
   // ---------- DASHBOARD ----------
   function refreshAssignments() {
-    return apiGet('lookup', { sabun: state.sabun }).then(res => {
+    return apiGet('lookup', { sessionToken: state.sessionToken }).then(res => {
       if (res.ok) state.assignments = res.assignments;
     });
   }
@@ -720,6 +730,7 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
 
   // ---------- FORM ----------
   let formState = null; // { intern, role, scores:{}, notes:{}, risk:{}, opinion, recommendation }
+  let formDirty = false; // 사용자가 폼을 실제로 건드렸는지 (취소/뒤로가기 확인용 — 기존 제출값 불러오기 자체는 dirty로 치지 않음)
 
   function openForm(assignment) {
     state.view = 'form';
@@ -728,9 +739,10 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
       role: assignment.role,
       scores: {}, notes: {}, risk: {}, opinion: '', recommendation: '', recoManual: false
     };
+    formDirty = false;
     render();
     // Try to load previous answer for editing
-    apiGet('myRecord', { sabun: state.sabun, intern: assignment.intern }).then(res => {
+    apiGet('myRecord', { sessionToken: state.sessionToken, intern: assignment.intern }).then(res => {
       if (res.ok && res.record) {
         const r = res.record;
         AREA_FIELD_MAP.forEach(([key, sk, nk]) => {
@@ -757,6 +769,7 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
       <div id="formBody"></div>
     </div>`;
     document.getElementById('backBtn').onclick = () => {
+      if (formDirty && !confirm('작성 중인 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?')) return;
       state.view = 'dashboard';
       refreshAssignments().then(render);
     };
@@ -802,8 +815,9 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
       <div class="card">
         <div class="section-title">위험요인 체크리스트</div>
         <div class="page-desc" style="margin-bottom:8px;">'주의' 또는 '중대'로 체크한 항목은 구체적 사실(발생시점·상황·지도내용·개선여부)을 반드시 작성합니다. 위험요인은 점수로 상쇄하지 않습니다.</div>
+        <div style="overflow-x:auto;">
         <table class="risk-table">
-          <thead><tr><th style="width:26%;">위험요인</th><th style="width:30%;">판단 기준</th><th style="width:18%;">해당 여부</th><th>구체적 사실</th></tr></thead>
+          <thead><tr><th style="width:28%;">위험요인</th><th style="width:28%;">판단 기준</th><th style="width:12%;">해당 여부</th><th style="width:32%;">구체적 사실</th></tr></thead>
           <tbody>
           ${RISK_ITEMS.map((item, i) => {
             const cur = formState.risk[i] || { level: '해당없음', detail: '' };
@@ -812,9 +826,9 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
             return `
             <tr>
               <td>${escapeHtml(item)}</td>
-              <td style="font-size:11.5px;color:#6b7484;">
-                <div><strong style="color:var(--warn);">주의</strong>: ${escapeHtml(crit.caution)}</div>
-                <div style="margin-top:4px;"><strong style="color:var(--bad);">중대</strong>: ${escapeHtml(crit.serious)}</div>
+              <td style="font-size:12px;color:#40495a;">
+                <div><span class="risk-crit-tag warn">주의</span>${escapeHtml(crit.caution)}</div>
+                <div style="margin-top:6px;"><span class="risk-crit-tag bad">중대</span>${escapeHtml(crit.serious)}</div>
               </td>
               <td>
                 <div class="risk-radio-group">
@@ -824,12 +838,13 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
                 </div>
               </td>
               <td>
-                <input type="text" class="risk-detail" data-risk-detail="${i}" ${needsDetail ? '' : 'style="display:none;"'} value="${escapeHtml(cur.detail || '')}" placeholder="발생시점 · 상황 · 지도내용 · 개선여부" />
+                <textarea class="risk-detail" data-risk-detail="${i}" ${needsDetail ? '' : 'style="display:none;"'} placeholder="발생시점 · 상황 · 지도내용 · 개선여부">${escapeHtml(cur.detail || '')}</textarea>
               </td>
             </tr>`;
           }).join('')}
           </tbody>
         </table>
+        </div>
       </div>`;
 
     const opinionHtml = `
@@ -872,13 +887,14 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
         const area = el.dataset.area;
         const score = Number(el.dataset.score);
         formState.scores[area] = score;
+        formDirty = true;
         applyAutoRecommendation();
         renderFormBody();
       });
     });
     // bind notes
     body.querySelectorAll('[data-note]').forEach(el => {
-      el.addEventListener('input', () => { formState.notes[el.dataset.note] = el.value; });
+      el.addEventListener('input', () => { formState.notes[el.dataset.note] = el.value; formDirty = true; });
     });
     // bind risk radios
     body.querySelectorAll('[data-risk-idx]').forEach(el => {
@@ -886,7 +902,9 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
         const idx = el.dataset.riskIdx;
         const cur = formState.risk[idx] || {};
         cur.level = el.value;
+        if (cur.level === '해당없음') cur.detail = ''; // 해당없음으로 되돌리면 이전 상세 텍스트도 함께 비움
         formState.risk[idx] = cur;
+        formDirty = true;
         applyAutoRecommendation();
         renderFormBody();
       });
@@ -897,21 +915,24 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
         const cur = formState.risk[idx] || { level: '해당없음' };
         cur.detail = el.value;
         formState.risk[idx] = cur;
+        formDirty = true;
       });
     });
     // opinion
     const opinionEl = document.getElementById('opinionInput');
-    if (opinionEl) opinionEl.addEventListener('input', () => { formState.opinion = opinionEl.value; });
+    if (opinionEl) opinionEl.addEventListener('input', () => { formState.opinion = opinionEl.value; formDirty = true; });
     // recommendation
     body.querySelectorAll('#recoGroup label').forEach(el => {
       el.addEventListener('click', () => {
         formState.recommendation = el.dataset.reco;
         formState.recoManual = true;
+        formDirty = true;
         renderFormBody();
       });
     });
 
     document.getElementById('cancelBtn').onclick = () => {
+      if (formDirty && !confirm('작성 중인 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?')) return;
       state.view = 'dashboard';
       refreshAssignments().then(render);
     };
@@ -951,8 +972,7 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
     btn.textContent = '제출 중...';
     apiPost({
       action: 'submit',
-      sabun: state.sabun,
-      evaluatorName: state.evaluatorName,
+      sessionToken: state.sessionToken,
       role: formState.role,
       intern: formState.intern,
       scores: formState.scores,
@@ -984,10 +1004,10 @@ const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
     else if (state.view === 'form') renderForm();
   }
 
-  // Restore session if sabun already known
-  if (state.sabun && configured()) {
+  // Restore session if a session token already known
+  if (state.sessionToken && configured()) {
     state.view = 'dashboard';
-    apiGet('lookup', { sabun: state.sabun }).then(res => {
+    apiGet('lookup', { sessionToken: state.sessionToken }).then(res => {
       if (res.ok) {
         state.evaluatorName = res.evaluatorName;
         state.assignments = res.assignments;
