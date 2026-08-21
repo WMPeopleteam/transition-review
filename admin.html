@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 · 채용연계형 인턴 리뷰</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+:root {
+  --navy: #16233f;
+  --navy-2: #223761;
+  --accent: #2f6feb;
+  --accent-soft: #e8f0ff;
+  --ink: #1c222c;
+  --muted: #6b7484;
+  --line: #e3e6ec;
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --good: #1e8a5f;
+  --warn: #b8860b;
+  --bad: #c0392b;
+  --radius: 10px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  font-size: 15px;
+}
+
+a { color: inherit; }
+
+.topbar {
+  background: var(--navy);
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar .brand {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.2px;
+}
+.topbar .brand small {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  color: #aab7cf;
+  margin-top: 2px;
+}
+.topbar .who { font-size: 13px; color: #cfd8ea; }
+.topbar .who button {
+  margin-left: 12px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid #445580;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.topbar .who button:hover { background: #223761; }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+}
+
+.center-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(22, 35, 63, 0.10);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+.login-card .mark {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--navy); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; margin: 0 auto 18px;
+}
+.login-card h1 { font-size: 18px; margin: 0 0 4px; }
+.login-card p.sub { color: var(--muted); font-size: 13px; margin: 0 0 22px; }
+
+input[type="text"], input[type="password"], textarea, select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+textarea { resize: vertical; min-height: 70px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  width: 100%;
+}
+.btn:hover { background: #2557c4; }
+.btn:disabled { background: #b7c4de; cursor: not-allowed; }
+.btn.secondary {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  width: auto;
+}
+.btn.secondary:hover { background: #f0f2f5; }
+.btn.small { padding: 6px 12px; font-size: 12.5px; width: auto; }
+
+.error-msg {
+  color: var(--bad);
+  font-size: 13px;
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.section-title .pts { font-weight: 400; font-size: 12.5px; color: var(--muted); }
+
+.hello { font-size: 15px; margin-bottom: 2px; }
+.hello strong { color: var(--navy); }
+.page-desc { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+.assign-list { display: flex; flex-direction: column; gap: 10px; }
+.assign-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 18px;
+}
+.assign-item .info { display: flex; flex-direction: column; gap: 2px; }
+.assign-item .intern-name { font-weight: 700; font-size: 15px; }
+.assign-item .meta { font-size: 12.5px; color: var(--muted); }
+.badge {
+  font-size: 11.5px; font-weight: 600; border-radius: 20px; padding: 3px 10px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.badge.role { background: #eef0f4; color: var(--muted); margin-right: 6px; }
+.badge.done { background: #e5f6ee; color: var(--good); }
+.badge.pending { background: #fdf1e0; color: var(--warn); }
+
+.level-group { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 6px; }
+.level-option {
+  display: flex; gap: 10px; align-items: flex-start;
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  cursor: pointer; transition: border-color .12s, background .12s;
+}
+.level-option:hover { border-color: #b9c5dd; }
+.level-option.selected { border-color: var(--accent); background: var(--accent-soft); }
+.level-option input { margin-top: 3px; }
+.level-option .lv-head { font-weight: 700; font-size: 13.5px; }
+.level-option .lv-text { font-size: 13px; color: #40495a; margin-top: 2px; }
+.level-option .lv-pts { font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 400; }
+
+.note-field { margin-top: 10px; }
+.note-field label { font-size: 12.5px; color: var(--muted); display: block; margin-bottom: 4px; }
+
+.risk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.risk-table th, .risk-table td { border-bottom: 1px solid var(--line); padding: 10px 6px; text-align: left; vertical-align: top; }
+.risk-table th { color: var(--muted); font-weight: 600; font-size: 12px; }
+.risk-radio-group { display: flex; gap: 12px; }
+.risk-radio-group label { display: flex; align-items: center; gap: 4px; font-size: 12.5px; white-space: nowrap; }
+.risk-detail { width: 100%; }
+
+.field-row { margin-bottom: 16px; }
+.field-row label.field-label { display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; }
+
+.reco-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.reco-group label {
+  border: 1px solid var(--line); border-radius: 20px; padding: 7px 14px; font-size: 13px; cursor: pointer;
+}
+.reco-group input { display: none; }
+.reco-group label.selected { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+table.admin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: #fff; }
+table.admin-table th, table.admin-table td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; }
+table.admin-table th { color: var(--muted); font-weight: 600; font-size: 12.5px; }
+table.admin-table tr:hover td { background: #fafbfc; }
+.progress-pill { font-weight: 700; }
+.progress-pill.full { color: var(--good); }
+.progress-pill.partial { color: var(--warn); }
+.progress-pill.zero { color: var(--muted); }
+
+.role-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; padding: 2px 8px; border-radius: 20px; margin-right: 4px; margin-bottom: 4px; background: #eef0f4; color: var(--muted); }
+.role-chip.on { background: #e5f6ee; color: var(--good); }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 10px; flex-wrap: wrap; }
+.toolbar .actions { display: flex; gap: 8px; }
+
+.stat-row { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat-box { flex: 1; min-width: 140px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.stat-box .num { font-size: 26px; font-weight: 800; color: var(--navy); }
+.stat-box .lbl { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+/* Report / print */
+.report-page {
+  background: #fff;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 40px 44px;
+  border: 1px solid var(--line);
+}
+.report-page h1 { font-size: 20px; margin: 0 0 2px; }
+.report-page .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
+.report-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 24px; margin-bottom: 18px; font-size: 13px; }
+.report-grid div span.k { color: var(--muted); margin-right: 6px; }
+.report-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 16px; }
+.report-table th, .report-table td { border: 1px solid var(--line); padding: 6px 8px; text-align: center; }
+.report-table th { background: #f5f6f8; }
+.report-table td.text-cell { text-align: left; font-size: 12px; }
+.report-final { font-size: 14px; font-weight: 700; margin-top: 6px; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .report-page { border: none; padding: 0; }
+}
+
+.empty-state { text-align: center; color: var(--muted); padding: 60px 20px; }
+
+.loading-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--muted); margin-right: 4px; }
+
+</style>
+</head>
+<body>
+
+<div id="topbar" class="topbar" style="display:none;">
+  <div class="brand">채용연계형 인턴 리뷰 · 관리자<small>진행 현황 및 결과 관리</small></div>
+  <div class="who" id="whoBox"></div>
+</div>
+
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+
+
+    // ==== rubric.js ====
+// 채용연계형 인턴 역량평가 문항 데이터
+// 원본: "1__채용연계형_인턴_역량평가서.DOC" 기준, 4개 평가자(현장소장/공사책임자/멘토/동료) 공통 문항으로 재구성
+
+const SCALE_DESC = [
+  { score: 4, grade: '우수', desc: '기대수준을 명확히 초과함. 스스로 확인하고 개선하는 행동이 반복적으로 확인됨 — 구체적 사례 작성 필수' },
+  { score: 3, grade: '적합', desc: '정규직 전환에 필요한 기본 기대수준을 충족함' },
+  { score: 2, grade: '보완 필요', desc: '기대수준에 일부 미달함. 반복적인 지도와 확인이 필요함' },
+  { score: 1, grade: '미흡', desc: '정규직 전환에 우려가 큼. 기본 태도나 수행 측면에서 문제 발생 가능성이 높음 — 구체적 사례 작성 필수' }
+];
+
+const RUBRIC_AREAS = [
+  {
+    key: 'area1',
+    no: '①',
+    title: '기본 근무태도',
+    maxPoints: 20,
+    levels: [
+      { score: 4, grade: '우수', converted: 20, text: '출근, 시간 준수, 업무 준비 상태가 안정적이며 지시받은 일을 책임감 있게 마무리한다. 별도로 챙기지 않아도 기본적인 근무 태도가 유지된다.' },
+      { score: 3, grade: '적합', converted: 17, text: '출결과 시간 준수에 문제가 없고, 지시받은 업무를 성실히 수행한다. 일부 미숙함은 있으나 기본 태도는 적합하다.' },
+      { score: 2, grade: '보완 필요', converted: 12, text: '지각, 준비 부족, 업무 집중도 저하 등 보완이 필요한 모습이 일부 확인된다. 반복적인 확인이 필요하다.' },
+      { score: 1, grade: '미흡', converted: 6, text: '근태, 성실성, 책임감 측면에서 정규직 전환에 우려가 크다. 기본적인 약속이나 지시사항을 반복적으로 지키지 않는다.' }
+    ]
+  },
+  {
+    key: 'area2',
+    no: '②',
+    title: '학습태도 및 피드백 수용',
+    maxPoints: 25,
+    levels: [
+      { score: 4, grade: '우수', converted: 25, text: '모르는 내용을 적극적으로 질문하고 메모하며, 피드백을 받은 뒤 실제 행동이 개선된다. 같은 지적이 반복되지 않는다.' },
+      { score: 3, grade: '적합', converted: 21, text: '배우려는 태도가 있고 피드백을 수용한다. 일부 반복 설명은 필요하나 전반적으로 개선되는 모습이 있다.' },
+      { score: 2, grade: '보완 필요', converted: 15, text: '질문이나 학습 노력이 부족하거나, 피드백 이후에도 개선 속도가 느리다. 같은 내용을 여러 번 설명해야 한다.' },
+      { score: 1, grade: '미흡', converted: 8, text: '배우려는 태도나 개선 의지가 부족하다. 피드백을 방어적으로 받아들이거나 같은 문제가 반복된다.' }
+    ]
+  },
+  {
+    key: 'area3',
+    no: '③',
+    title: '현장 적응 및 협업',
+    maxPoints: 20,
+    levels: [
+      { score: 4, grade: '우수', converted: 20, text: '현장 구성원과 자연스럽게 소통하고, 필요한 경우 먼저 확인하거나 협조를 요청한다. 현장 분위기에 빠르게 적응한다.' },
+      { score: 3, grade: '적합', converted: 17, text: '기본적인 인사, 소통, 협업 태도가 적절하다. 낯설어하는 모습은 있으나 현장 근무에 큰 문제는 없다.' },
+      { score: 2, grade: '보완 필요', converted: 12, text: '소극적이거나 의사소통이 부족하여 업무 확인이 늦어지는 경우가 있다. 현장 적응에 시간이 더 필요하다.' },
+      { score: 1, grade: '미흡', converted: 6, text: '현장 구성원과의 관계 형성에 어려움이 크거나, 부적절한 언행으로 협업에 우려가 있다.' }
+    ]
+  },
+  {
+    key: 'area4',
+    no: '④',
+    title: '업무수행 기초역량',
+    maxPoints: 25,
+    levels: [
+      { score: 4, grade: '우수', converted: 25, text: '지시사항을 정확히 이해하고, 업무 결과를 정리해 보고할 수 있다. 간단한 과제는 스스로 구조화하여 수행한다.' },
+      { score: 3, grade: '적합', converted: 21, text: '기본적인 지시사항을 이해하고 수행한다. 일부 보완은 필요하나 지도 하에 업무를 따라올 수 있다.' },
+      { score: 2, grade: '보완 필요', converted: 15, text: '지시사항 이해가 부족하거나 업무 결과의 정확성이 낮다. 수행 과정에서 반복적인 확인과 수정이 필요하다.' },
+      { score: 1, grade: '미흡', converted: 8, text: '기본적인 업무 지시를 이해하거나 수행하는 데 어려움이 크다. 업무를 맡기기 어렵다는 우려가 있다.' }
+    ]
+  },
+  {
+    key: 'area5',
+    no: '⑤',
+    title: '성장가능성 및 직무적합성',
+    maxPoints: 10,
+    levels: [
+      { score: 4, grade: '우수', converted: 10, text: '건축현장 직무에 대한 관심이 높고, 힘든 환경에서도 배우려는 태도가 뚜렷하다. 향후 성장 가능성이 높다고 판단된다.' },
+      { score: 3, grade: '적합', converted: 9, text: '현장 직무에 대한 기본 관심과 적응 가능성이 있다. 정규직 전환 후 육성 가능성이 있다고 판단된다.' },
+      { score: 2, grade: '보완 필요', converted: 6, text: '직무 관심도나 성장 가능성이 다소 불명확하다. 정규직 전환 후에도 적응 지원이 많이 필요할 수 있다.' },
+      { score: 1, grade: '미흡', converted: 3, text: '현장 직무와의 적합성이 낮아 보인다. 본인도 직무에 대한 관심이나 지속 근무 의지가 부족해 보인다.' }
+    ]
+  }
+];
+
+const RISK_ITEMS = [
+  '지각, 결근, 무단이탈 등 근태 문제',
+  '지시사항 불이행 또는 임의 판단',
+  '허위보고 또는 사실과 다른 보고',
+  '피드백 이후에도 동일 문제 반복',
+  '현장 구성원과의 갈등 또는 부적절한 언행',
+  '업무에 대한 현저한 무관심 또는 회피',
+  '기본적인 책임감 부족'
+];
+
+// 각 위험요인의 '주의'/'중대' 판단 기준 (평가서/리포트에 참고용으로 노출)
+const RISK_CRITERIA = [
+  { caution: '월 1~2회 수준의 지각·조퇴, 사전 미고지 반차 등이 있었던 경우', serious: '무단결근 또는 무단 이탈이 1회 이상 있었던 경우' },
+  { caution: '지시받은 방식과 다르게 임의로 처리해 재작업이 필요했던 경우', serious: '안전·품질 등 중요 지시를 의도적으로 무시하거나 반복적으로 임의 판단한 경우' },
+  { caution: '보고 내용에 착오나 누락이 반복되는 경우', serious: '사실과 다른 내용을 알면서도 보고했거나, 문제를 은폐하려 한 정황이 있는 경우' },
+  { caution: '같은 지적을 2회 이상 받았지만 개선 시도는 보이는 경우', serious: '동일한 지적을 3회 이상 받았음에도 개선 의지가 없어 보이는 경우' },
+  { caution: '구성원과 마찰이 1~2회 있었으나 일시적인 경우', serious: '반복적인 갈등, 폭언, 따돌림 등으로 현장 분위기에 지장을 준 경우' },
+  { caution: '업무 관심도가 낮아 보이는 순간이 종종 있었던 경우', serious: '맡은 업무를 지속적으로 회피하거나 방치한 경우' },
+  { caution: '사소한 실수에 대한 책임 회피 발언이 있었던 경우', serious: '중대한 실수에 대해 책임을 전가하거나 인정하지 않는 경우' }
+];
+
+const RISK_LEVELS = ['해당없음', '주의', '중대'];
+
+const RECOMMENDATION_OPTIONS = ['전환 권고', '조건부 전환', '전환 신중', '미전환 권고'];
+
+const TRANSITION_MATRIX = [
+  { label: '전환 권고', desc: '역량리뷰 80점 이상 + 중대 위험요인 없음' },
+  { label: '조건부 전환', desc: '역량리뷰 70점 이상 80점 미만 또는 주의 위험요인 1건' },
+  { label: '전환 신중', desc: '역량리뷰 60점 이상 70점 미만 또는 주의 위험요인 2건 이상' },
+  { label: '미전환 권고', desc: '역량리뷰 60점 미만 또는 중대 위험요인 있음' }
+];
+
+// 5개 영역 환산점수 합계 + 위험요인 단계로 추천의견을 자동 계산
+function computeAutoRecommendation(scores, risk) {
+  let total = 0;
+  let scoredCount = 0;
+  RUBRIC_AREAS.forEach(area => {
+    const raw = scores[area.key];
+    const lv = area.levels.find(l => l.score === raw);
+    if (lv) { total += lv.converted; scoredCount++; }
+  });
+  if (scoredCount < RUBRIC_AREAS.length) return null; // 아직 5개 영역 모두 선택 전
+
+  let cautionCount = 0, seriousCount = 0;
+  Object.keys(risk || {}).forEach(k => {
+    const lv = risk[k] && risk[k].level;
+    if (lv === '주의') cautionCount++;
+    if (lv === '중대') seriousCount++;
+  });
+
+  const scoreTier = total >= 80 ? 4 : total >= 70 ? 3 : total >= 60 ? 2 : 1;
+  const riskTier = seriousCount > 0 ? 1 : cautionCount >= 2 ? 2 : cautionCount === 1 ? 3 : 4;
+  const tier = Math.min(scoreTier, riskTier);
+  return RECOMMENDATION_OPTIONS[4 - tier]; // tier4→전환권고(idx0) ... tier1→미전환권고(idx3)
+}
+
+// 평가결과 시트의 컬럼명과 RUBRIC_AREAS.key를 매핑 (app.js / report.js 공용)
+const AREA_FIELD_MAP = [
+  ['area1', '①기본근무태도_점수', '①근거'],
+  ['area2', '②학습태도피드백_점수', '②근거'],
+  ['area3', '③현장적응협업_점수', '③근거'],
+  ['area4', '④업무수행기초역량_점수', '④근거'],
+  ['area5', '⑤성장가능성직무적합성_점수', '⑤근거']
+];
+
+// 화면 표시용 역할 라벨 (Google Sheet 컬럼명은 그대로 '동료' 유지, 화면 표기만 '멘토B')
+const ROLE_LABELS = {
+  '현장소장': '현장소장',
+  '공사책임자': '공사책임자',
+  '멘토': '멘토',
+  '동료': '멘토B'
+};
+function roleLabel(role) { return ROLE_LABELS[role] || role; }
+
+// 5개 영역 환산점수 합계 계산 (선택된 영역만 집계, 몇 개 선택됐는지도 함께 반환)
+function computeTotalScore(scores) {
+  let total = 0, scoredCount = 0;
+  RUBRIC_AREAS.forEach(area => {
+    const raw = scores[area.key];
+    const lv = area.levels.find(l => l.score === raw);
+    if (lv) { total += lv.converted; scoredCount++; }
+  });
+  return { total, scoredCount, maxCount: RUBRIC_AREAS.length };
+}
+
+
+    // ==== config.js (Apps Script 배포 URL은 여기서 수정) ====
+// Google Apps Script 웹앱 배포 후 발급되는 URL을 아래에 붙여넣으세요.
+// 예: https://script.google.com/macros/s/AKfycbx.../exec
+// 설정 방법은 README.md의 "3. Apps Script 배포" 참고
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbxVe9ulY_-ymlUjnsgvgGg3dwZZIDI9QH26Mb2bAvNasQol_ZSZUOCBLVDO238338_Y/exec'
+};
+
+// 제출/수정 마감 시각 (서버(Code.gs)의 SUBMIT_DEADLINE과 반드시 동일하게 유지)
+const SUBMIT_DEADLINE = new Date('2026-08-26T12:00:00+09:00');
+
+
+
+    // ==== admin.js ====
+(function () {
+  const appEl = document.getElementById('app');
+  const topbar = document.getElementById('topbar');
+  const whoBox = document.getElementById('whoBox');
+
+  let state = {
+    code: sessionStorage.getItem('tr_admin_code') || '',
+    view: sessionStorage.getItem('tr_admin_code') ? 'dashboard' : 'login',
+    interns: []
+  };
+
+  function apiGet(action, params) {
+    const url = new URL(CONFIG.API_URL);
+    url.searchParams.set('action', action);
+    Object.keys(params || {}).forEach(k => url.searchParams.set(k, params[k]));
+    return fetch(url.toString()).then(r => r.json());
+  }
+
+  function configured() {
+    return CONFIG.API_URL && CONFIG.API_URL.indexOf('PASTE_YOUR') === -1;
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function updateTopbar() {
+    if (state.view === 'login') { topbar.style.display = 'none'; return; }
+    topbar.style.display = 'flex';
+    whoBox.innerHTML = `<button id="logoutBtn">로그아웃</button>
+      <a href="index.html" style="margin-left:10px;color:#cfd8ea;font-size:12px;">← 리뷰자 화면</a>`;
+    document.getElementById('logoutBtn').onclick = logout;
+  }
+
+  function logout() {
+    sessionStorage.removeItem('tr_admin_code');
+    state = { code: '', view: 'login', interns: [] };
+    render();
+  }
+
+  function renderLogin() {
+    appEl.innerHTML = `
+    <div class="center-wrap">
+      <div class="login-card">
+        <div class="mark">관리</div>
+        <h1>관리자 접속</h1>
+        <p class="sub">인사담당자에게 전달받은 접속 코드를 입력하세요.</p>
+        ${!configured() ? `<p class="error-msg" style="margin-bottom:14px;">⚠ 서버(Apps Script) 연결이 설정되지 않았습니다. config.js를 확인해주세요.</p>` : ''}
+        <div class="field-row" style="text-align:left;">
+          <input type="password" id="codeInput" placeholder="접속 코드" />
+        </div>
+        <button class="btn" id="loginBtn">입장</button>
+        <div class="error-msg" id="loginError"></div>
+      </div>
+    </div>`;
+    document.getElementById('loginBtn').onclick = doLogin;
+    document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  }
+
+  function doLogin() {
+    const code = document.getElementById('codeInput').value.trim();
+    const errEl = document.getElementById('loginError');
+    if (!code) { errEl.textContent = '접속 코드를 입력해주세요.'; return; }
+    apiGet('adminLogin', { code }).then(res => {
+      if (!res.ok) { errEl.textContent = res.error || '접속 코드가 올바르지 않습니다.'; return; }
+      state.code = code;
+      sessionStorage.setItem('tr_admin_code', code);
+      state.view = 'dashboard';
+      loadDashboard();
+    }).catch(() => { errEl.textContent = '서버에 연결할 수 없습니다.'; });
+  }
+
+  function loadDashboard() {
+    appEl.innerHTML = `<div class="wrap"><div class="empty-state">불러오는 중...</div></div>`;
+    updateTopbar();
+    apiGet('adminData', { code: state.code }).then(res => {
+      if (!res.ok) { logout(); return; }
+      state.interns = res.interns;
+      renderDashboard();
+    });
+  }
+
+  function renderDashboard() {
+    const total = state.interns.length;
+    const fullyDone = state.interns.filter(i => i.doneCount === i.total).length;
+    const totalSlots = state.interns.reduce((s, i) => s + i.total, 0);
+    const doneSlots = state.interns.reduce((s, i) => s + i.doneCount, 0);
+
+    appEl.innerHTML = `
+    <div class="wrap">
+      <div class="toolbar">
+        <div class="hello">리뷰 진행 현황</div>
+        <div class="actions">
+          <button class="btn secondary small" id="refreshBtn">새로고침</button>
+          <button class="btn secondary small" id="exportBtn">엑셀 다운로드</button>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><div class="num">${total}</div><div class="lbl">전체 인턴</div></div>
+        <div class="stat-box"><div class="num">${fullyDone}</div><div class="lbl">4명 리뷰 모두 완료</div></div>
+        <div class="stat-box"><div class="num">${doneSlots} / ${totalSlots}</div><div class="lbl">전체 제출 건수</div></div>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>인턴</th><th>배치현장</th><th>진행률</th><th>리뷰자별 제출 현황</th><th></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      ${renderOtpTool()}
+    </div>`;
+
+    document.getElementById('refreshBtn').onclick = loadDashboard;
+    document.getElementById('exportBtn').onclick = exportExcel;
+    bindOtpTool();
+
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = state.interns.map(intern => {
+      const pct = intern.doneCount === intern.total ? 'full' : (intern.doneCount === 0 ? 'zero' : 'partial');
+      return `
+      <tr>
+        <td><strong>${escapeHtml(intern.intern)}</strong></td>
+        <td>${escapeHtml(intern.site || '')}</td>
+        <td><span class="progress-pill ${pct}">${intern.doneCount} / ${intern.total}</span></td>
+        <td>${intern.roles.map(r => `<span class="role-chip ${r.submitted ? 'on' : ''}">${escapeHtml(roleLabel(r.role))}${r.submitted ? ' ✓' : ''}</span>`).join('')}</td>
+        <td><button class="btn secondary small" data-intern="${escapeHtml(intern.intern)}">리포트 보기</button></td>
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('button[data-intern]').forEach(btn => {
+      btn.onclick = () => {
+        window.location.href = `report.html?intern=${encodeURIComponent(btn.dataset.intern)}`;
+      };
+    });
+  }
+
+  function exportExcel() {
+    apiGet('adminAllRecords', { code: state.code }).then(res => {
+      if (!res.ok) { alert(res.error || '내보내기에 실패했습니다.'); return; }
+      const records = res.records;
+      if (!records.length) { alert('아직 제출된 리뷰가 없습니다.'); return; }
+      const rows = records.map(r => {
+        let risk = {};
+        try { risk = JSON.parse(r['위험요인_JSON'] || '{}'); } catch (e) {}
+        const flagged = Object.keys(risk).filter(i => risk[i] && risk[i].level && risk[i].level !== '해당없음');
+        const riskSummary = flagged.map(i => `${RISK_ITEMS[i]}(${risk[i].level})`).join('; ');
+
+        const row = {
+          '제출시각': r['제출시각'],
+          '사번': r['사번'],
+          '리뷰자명': r['평가자명'],
+          '역할': roleLabel(r['역할']),
+          '피리뷰자': r['피평가자']
+        };
+        let total = 0;
+        AREA_FIELD_MAP.forEach(([key, scoreField, noteField], idx) => {
+          const area = RUBRIC_AREAS[idx];
+          const raw = Number(r[scoreField]);
+          const lv = area.levels.find(l => l.score === raw);
+          const conv = lv ? lv.converted : '';
+          if (lv) total += lv.converted;
+          row[`${area.no}${area.title}_환산점수`] = conv;
+          row[`${area.no}${area.title}_근거`] = r[noteField] || '';
+        });
+        row['합계(100점만점)'] = total;
+        row['위험요인_요약'] = riskSummary;
+        row['종합의견'] = r['종합의견'] || '';
+        row['리뷰자추천의견'] = r['평가자추천의견'] || '';
+        return row;
+      });
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '리뷰결과(환산)');
+      const ts = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `인턴리뷰결과_${ts}.xlsx`);
+    });
+  }
+
+  function renderOtpTool() {
+    return `
+    <div class="card" style="margin-top:24px;">
+      <div class="section-title">테스트용 인증번호 발급</div>
+      <div class="page-desc" style="margin-bottom:10px;">리뷰자 사번을 넣고 발급하면, <strong>해당 리뷰자에게는 메일이 가지 않고</strong> 여기 화면에만 인증번호가 표시됩니다. 발급 후 리뷰자 사이트(index.html) 로그인 화면 하단의 <strong>"관리자에게 받은 인증번호가 있으신가요?"</strong> 링크를 눌러 사번+인증번호를 바로 입력하면 로그인됩니다. (5분간 유효)</div>
+      <div style="display:flex;gap:8px;max-width:360px;">
+        <input type="text" id="otpTestSabun" placeholder="사번 입력" style="flex:1;" inputmode="numeric" />
+        <button class="btn secondary small" id="otpTestBtn">발급</button>
+      </div>
+      <div id="otpTestResult" style="margin-top:10px;font-size:13px;"></div>
+    </div>`;
+  }
+
+  function bindOtpTool() {
+    const btn = document.getElementById('otpTestBtn');
+    if (!btn) return;
+    btn.onclick = () => {
+      const sabun = document.getElementById('otpTestSabun').value.trim();
+      const resultEl = document.getElementById('otpTestResult');
+      resultEl.textContent = '';
+      if (!sabun) { resultEl.innerHTML = '<span style="color:var(--bad);">사번을 입력해주세요.</span>'; return; }
+      apiGet('adminIssueOtp', { code: state.code, sabun }).then(res => {
+        if (!res.ok) { resultEl.innerHTML = `<span style="color:var(--bad);">${escapeHtml(res.error || '발급 실패')}</span>`; return; }
+        resultEl.innerHTML = `<strong>${escapeHtml(res.name)}</strong>님 인증번호: <span style="font-size:18px;font-weight:800;color:var(--navy);letter-spacing:2px;">${escapeHtml(res.otp)}</span> <span style="color:var(--muted);">(5분간 유효, 메일 발송 없음)</span>`;
+      });
+    };
+  }
+
+  function render() {
+    updateTopbar();
+    if (state.view === 'login') renderLogin();
+    else loadDashboard();
+  }
+
+  render();
+})();
+
+</script>
+</body>
+</html>
