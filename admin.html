@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 · 인턴·신입사원 리뷰</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+:root {
+  --navy: #16233f;
+  --navy-2: #223761;
+  --accent: #2f6feb;
+  --accent-soft: #e8f0ff;
+  --ink: #1c222c;
+  --muted: #6b7484;
+  --line: #e3e6ec;
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --good: #1e8a5f;
+  --warn: #b8860b;
+  --bad: #c0392b;
+  --radius: 10px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  font-size: 15px;
+}
+
+a { color: inherit; }
+
+.topbar {
+  background: var(--navy);
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar .brand {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.2px;
+}
+.topbar .brand small {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  color: #aab7cf;
+  margin-top: 2px;
+}
+.topbar .who { font-size: 13px; color: #cfd8ea; }
+.topbar .who button {
+  margin-left: 12px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid #445580;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.topbar .who button:hover { background: #223761; }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+}
+
+.center-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(22, 35, 63, 0.10);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+.login-card .mark {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--navy); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; margin: 0 auto 18px;
+}
+.login-card h1 { font-size: 18px; margin: 0 0 4px; }
+.login-card p.sub { color: var(--muted); font-size: 13px; margin: 0 0 22px; }
+
+input[type="text"], input[type="password"], textarea, select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+textarea { resize: vertical; min-height: 70px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  width: 100%;
+}
+.btn:hover { background: #2557c4; }
+.btn:disabled { background: #b7c4de; cursor: not-allowed; }
+.btn.secondary {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  width: auto;
+}
+.btn.secondary:hover { background: #f0f2f5; }
+.btn.small { padding: 6px 12px; font-size: 12.5px; width: auto; }
+
+.error-msg {
+  color: var(--bad);
+  font-size: 13px;
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.section-title .pts { font-weight: 400; font-size: 12.5px; color: var(--muted); }
+
+.hello { font-size: 15px; margin-bottom: 2px; }
+.hello strong { color: var(--navy); }
+.page-desc { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+.assign-list { display: flex; flex-direction: column; gap: 10px; }
+.assign-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 18px;
+}
+.assign-item .info { display: flex; flex-direction: column; gap: 2px; }
+.assign-item .intern-name { font-weight: 700; font-size: 15px; }
+.assign-item .meta { font-size: 12.5px; color: var(--muted); }
+.badge {
+  font-size: 11.5px; font-weight: 600; border-radius: 20px; padding: 3px 10px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.badge.role { background: #eef0f4; color: var(--muted); margin-right: 6px; }
+.badge.done { background: #e5f6ee; color: var(--good); }
+.badge.pending { background: #fdf1e0; color: var(--warn); }
+
+.level-group { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 6px; }
+.level-option {
+  display: flex; gap: 10px; align-items: flex-start;
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  cursor: pointer; transition: border-color .12s, background .12s;
+}
+.level-option:hover { border-color: #b9c5dd; }
+.level-option.selected { border-color: var(--accent); background: var(--accent-soft); }
+.level-option input { margin-top: 3px; }
+.level-option .lv-head { font-weight: 700; font-size: 13.5px; }
+.level-option .lv-text { font-size: 13px; color: #40495a; margin-top: 2px; }
+.level-option .lv-pts { font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 400; }
+
+.note-field { margin-top: 10px; }
+.note-field label { font-size: 12.5px; color: var(--muted); display: block; margin-bottom: 4px; }
+
+.risk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.risk-table th, .risk-table td { border-bottom: 1px solid var(--line); padding: 10px 6px; text-align: left; vertical-align: top; }
+.risk-table th { color: var(--muted); font-weight: 600; font-size: 12px; }
+.risk-radio-group { display: flex; gap: 12px; }
+.risk-radio-group label { display: flex; align-items: center; gap: 4px; font-size: 12.5px; white-space: nowrap; }
+.risk-detail { width: 100%; }
+
+.field-row { margin-bottom: 16px; }
+.field-row label.field-label { display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px; }
+
+.reco-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.reco-group label {
+  border: 1px solid var(--line); border-radius: 20px; padding: 7px 14px; font-size: 13px; cursor: pointer;
+}
+.reco-group input { display: none; }
+.reco-group label.selected { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+table.admin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: #fff; }
+table.admin-table th, table.admin-table td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; }
+table.admin-table th { color: var(--muted); font-weight: 600; font-size: 12.5px; }
+table.admin-table tr:hover td { background: #fafbfc; }
+.progress-pill { font-weight: 700; }
+.progress-pill.full { color: var(--good); }
+.progress-pill.partial { color: var(--warn); }
+.progress-pill.zero { color: var(--muted); }
+
+.role-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; padding: 2px 8px; border-radius: 20px; margin-right: 4px; margin-bottom: 4px; background: #eef0f4; color: var(--muted); }
+.role-chip.on { background: #e5f6ee; color: var(--good); }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 10px; flex-wrap: wrap; }
+.toolbar .actions { display: flex; gap: 8px; }
+
+.stat-row { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat-box { flex: 1; min-width: 140px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.stat-box .num { font-size: 26px; font-weight: 800; color: var(--navy); }
+.stat-box .lbl { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+/* Report / print */
+.report-page {
+  background: #fff;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 40px 44px;
+  border: 1px solid var(--line);
+}
+.report-page h1 { font-size: 20px; margin: 0 0 2px; }
+.report-page .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
+.report-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 24px; margin-bottom: 18px; font-size: 13px; }
+.report-grid div span.k { color: var(--muted); margin-right: 6px; }
+.report-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 16px; }
+.report-table th, .report-table td { border: 1px solid var(--line); padding: 6px 8px; text-align: center; }
+.report-table th { background: #f5f6f8; }
+.report-table td.text-cell { text-align: left; font-size: 12px; }
+.report-final { font-size: 14px; font-weight: 700; margin-top: 6px; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .report-page { border: none; padding: 0; }
+}
+
+.empty-state { text-align: center; color: var(--muted); padding: 60px 20px; }
+
+.loading-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--muted); margin-right: 4px; }
+
+</style>
+</head>
+<body>
+
+<div id="topbar" class="topbar" style="display:none;">
+  <div class="brand">인턴·신입사원 리뷰 · 관리자<small>연도별 리뷰 진행 현황 및 결과 관리</small></div>
+  <div class="who" id="whoBox"></div>
+</div>
+
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+
+
+    // ==== rubric.js ====
+// 채용연계형 인턴 역량평가 문항 데이터
+// 원본: "1__채용연계형_인턴_역량평가서.DOC" 기준, 4개 평가자(현장소장/공사책임자/멘토/동료) 공통 문항으로 재구성
+
+const SCALE_DESC = [
+  { score: 4, grade: '우수', desc: '기대수준을 명확히 초과함. 스스로 확인하고 개선하는 행동이 반복적으로 확인됨 — 구체적 사례 작성 필수' },
+  { score: 3, grade: '적합', desc: '정규직 전환에 필요한 기본 기대수준을 충족함' },
+  { score: 2, grade: '보완 필요', desc: '기대수준에 일부 미달함. 반복적인 지도와 확인이 필요함' },
+  { score: 1, grade: '미흡', desc: '정규직 전환에 우려가 큼. 기본 태도나 수행 측면에서 문제 발생 가능성이 높음 — 구체적 사례 작성 필수' }
+];
+
+const RUBRIC_AREAS = [
+  {
+    key: 'area1',
+    no: '①',
+    title: '기본 근무태도',
+    maxPoints: 20,
+    levels: [
+      { score: 4, grade: '우수', converted: 20, text: '출근, 시간 준수, 업무 준비 상태가 안정적이며 지시받은 일을 책임감 있게 마무리한다. 별도로 챙기지 않아도 기본적인 근무 태도가 유지된다.' },
+      { score: 3, grade: '적합', converted: 17, text: '출결과 시간 준수에 문제가 없고, 지시받은 업무를 성실히 수행한다. 일부 미숙함은 있으나 기본 태도는 적합하다.' },
+      { score: 2, grade: '보완 필요', converted: 12, text: '지각, 준비 부족, 업무 집중도 저하 등 보완이 필요한 모습이 일부 확인된다. 반복적인 확인이 필요하다.' },
+      { score: 1, grade: '미흡', converted: 6, text: '근태, 성실성, 책임감 측면에서 정규직 전환에 우려가 크다. 기본적인 약속이나 지시사항을 반복적으로 지키지 않는다.' }
+    ]
+  },
+  {
+    key: 'area2',
+    no: '②',
+    title: '학습태도 및 피드백 수용',
+    maxPoints: 25,
+    levels: [
+      { score: 4, grade: '우수', converted: 25, text: '모르는 내용을 적극적으로 질문하고 메모하며, 피드백을 받은 뒤 실제 행동이 개선된다. 같은 지적이 반복되지 않는다.' },
+      { score: 3, grade: '적합', converted: 21, text: '배우려는 태도가 있고 피드백을 수용한다. 일부 반복 설명은 필요하나 전반적으로 개선되는 모습이 있다.' },
+      { score: 2, grade: '보완 필요', converted: 15, text: '질문이나 학습 노력이 부족하거나, 피드백 이후에도 개선 속도가 느리다. 같은 내용을 여러 번 설명해야 한다.' },
+      { score: 1, grade: '미흡', converted: 8, text: '배우려는 태도나 개선 의지가 부족하다. 피드백을 방어적으로 받아들이거나 같은 문제가 반복된다.' }
+    ]
+  },
+  {
+    key: 'area3',
+    no: '③',
+    title: '현장 적응 및 협업',
+    maxPoints: 20,
+    levels: [
+      { score: 4, grade: '우수', converted: 20, text: '현장 구성원과 자연스럽게 소통하고, 필요한 경우 먼저 확인하거나 협조를 요청한다. 현장 분위기에 빠르게 적응한다.' },
+      { score: 3, grade: '적합', converted: 17, text: '기본적인 인사, 소통, 협업 태도가 적절하다. 낯설어하는 모습은 있으나 현장 근무에 큰 문제는 없다.' },
+      { score: 2, grade: '보완 필요', converted: 12, text: '소극적이거나 의사소통이 부족하여 업무 확인이 늦어지는 경우가 있다. 현장 적응에 시간이 더 필요하다.' },
+      { score: 1, grade: '미흡', converted: 6, text: '현장 구성원과의 관계 형성에 어려움이 크거나, 부적절한 언행으로 협업에 우려가 있다.' }
+    ]
+  },
+  {
+    key: 'area4',
+    no: '④',
+    title: '업무수행 기초역량',
+    maxPoints: 25,
+    levels: [
+      { score: 4, grade: '우수', converted: 25, text: '지시사항을 정확히 이해하고, 업무 결과를 정리해 보고할 수 있다. 간단한 과제는 스스로 구조화하여 수행한다.' },
+      { score: 3, grade: '적합', converted: 21, text: '기본적인 지시사항을 이해하고 수행한다. 일부 보완은 필요하나 지도 하에 업무를 따라올 수 있다.' },
+      { score: 2, grade: '보완 필요', converted: 15, text: '지시사항 이해가 부족하거나 업무 결과의 정확성이 낮다. 수행 과정에서 반복적인 확인과 수정이 필요하다.' },
+      { score: 1, grade: '미흡', converted: 8, text: '기본적인 업무 지시를 이해하거나 수행하는 데 어려움이 크다. 업무를 맡기기 어렵다는 우려가 있다.' }
+    ]
+  },
+  {
+    key: 'area5',
+    no: '⑤',
+    title: '성장가능성 및 직무적합성',
+    maxPoints: 10,
+    levels: [
+      { score: 4, grade: '우수', converted: 10, text: '건축현장 직무에 대한 관심이 높고, 힘든 환경에서도 배우려는 태도가 뚜렷하다. 향후 성장 가능성이 높다고 판단된다.' },
+      { score: 3, grade: '적합', converted: 9, text: '현장 직무에 대한 기본 관심과 적응 가능성이 있다. 정규직 전환 후 육성 가능성이 있다고 판단된다.' },
+      { score: 2, grade: '보완 필요', converted: 6, text: '직무 관심도나 성장 가능성이 다소 불명확하다. 정규직 전환 후에도 적응 지원이 많이 필요할 수 있다.' },
+      { score: 1, grade: '미흡', converted: 3, text: '현장 직무와의 적합성이 낮아 보인다. 본인도 직무에 대한 관심이나 지속 근무 의지가 부족해 보인다.' }
+    ]
+  }
+];
+
+const RISK_ITEMS = [
+  '지각, 결근, 무단이탈 등 근태 문제',
+  '지시사항 불이행 또는 임의 판단',
+  '허위보고 또는 사실과 다른 보고',
+  '피드백 이후에도 동일 문제 반복',
+  '현장 구성원과의 갈등 또는 부적절한 언행',
+  '업무에 대한 현저한 무관심 또는 회피',
+  '기본적인 책임감 부족'
+];
+
+// 각 위험요인의 '주의'/'중대' 판단 기준 (평가서/리포트에 참고용으로 노출)
+const RISK_CRITERIA = [
+  { caution: '월 1~2회 수준의 지각·조퇴, 사전 미고지 반차 등이 있었던 경우', serious: '무단결근 또는 무단 이탈이 1회 이상 있었던 경우' },
+  { caution: '지시받은 방식과 다르게 임의로 처리해 재작업이 필요했던 경우', serious: '안전·품질 등 중요 지시를 의도적으로 무시하거나 반복적으로 임의 판단한 경우' },
+  { caution: '보고 내용에 착오나 누락이 반복되는 경우', serious: '사실과 다른 내용을 알면서도 보고했거나, 문제를 은폐하려 한 정황이 있는 경우' },
+  { caution: '같은 지적을 2회 이상 받았지만 개선 시도는 보이는 경우', serious: '동일한 지적을 3회 이상 받았음에도 개선 의지가 없어 보이는 경우' },
+  { caution: '구성원과 마찰이 1~2회 있었으나 일시적인 경우', serious: '반복적인 갈등, 폭언, 따돌림 등으로 현장 분위기에 지장을 준 경우' },
+  { caution: '업무 관심도가 낮아 보이는 순간이 종종 있었던 경우', serious: '맡은 업무를 지속적으로 회피하거나 방치한 경우' },
+  { caution: '사소한 실수에 대한 책임 회피 발언이 있었던 경우', serious: '중대한 실수에 대해 책임을 전가하거나 인정하지 않는 경우' }
+];
+
+const RISK_LEVELS = ['해당없음', '주의', '중대'];
+
+const RECOMMENDATION_OPTIONS = ['전환 권고', '조건부 전환', '전환 신중', '미전환 권고'];
+
+const TRANSITION_MATRIX = [
+  { label: '전환 권고', desc: '역량리뷰 80점 이상 + 중대 위험요인 없음' },
+  { label: '조건부 전환', desc: '역량리뷰 70점 이상 80점 미만 또는 주의 위험요인 1건' },
+  { label: '전환 신중', desc: '역량리뷰 60점 이상 70점 미만 또는 주의 위험요인 2건 이상' },
+  { label: '미전환 권고', desc: '역량리뷰 60점 미만 또는 중대 위험요인 있음' }
+];
+
+// 5개 영역 환산점수 합계 + 위험요인 단계로 추천의견을 자동 계산
+function computeAutoRecommendation(scores, risk, type) {
+  let total = 0;
+  let scoredCount = 0;
+  RUBRIC_AREAS.forEach(area => {
+    const raw = scores[area.key];
+    const lv = area.levels.find(l => l.score === raw);
+    if (lv) { total += lv.converted; scoredCount++; }
+  });
+  if (scoredCount < RUBRIC_AREAS.length) return null; // 아직 5개 영역 모두 선택 전
+
+  let cautionCount = 0, seriousCount = 0;
+  Object.keys(risk || {}).forEach(k => {
+    const lv = risk[k] && risk[k].level;
+    if (lv === '주의') cautionCount++;
+    if (lv === '중대') seriousCount++;
+  });
+
+  const scoreTier = total >= 80 ? 4 : total >= 70 ? 3 : total >= 60 ? 2 : 1;
+  const riskTier = seriousCount > 0 ? 1 : cautionCount >= 2 ? 2 : cautionCount === 1 ? 3 : 4;
+  const tier = Math.min(scoreTier, riskTier);
+  return recoOptionsOf(type)[4 - tier]; // tier4→전환권고(idx0) ... tier1→미전환권고(idx3)
+}
+
+// 평가결과 시트의 컬럼명과 RUBRIC_AREAS.key를 매핑 (app.js / report.js 공용)
+const AREA_FIELD_MAP = [
+  ['area1', '①기본근무태도_점수', '①근거'],
+  ['area2', '②학습태도피드백_점수', '②근거'],
+  ['area3', '③현장적응협업_점수', '③근거'],
+  ['area4', '④업무수행기초역량_점수', '④근거'],
+  ['area5', '⑤성장가능성직무적합성_점수', '⑤근거']
+];
+
+// 화면 표시용 역할 라벨 (Google Sheet 컬럼명은 그대로 '동료' 유지, 화면 표기만 '멘토B')
+const ROLE_LABELS = {
+  '현장소장': '현장소장',
+  '공사책임자': '공사책임자',
+  '멘토': '멘토',
+  '동료': '멘토B',
+  '팀장': '팀장'
+};
+function roleLabel(role) { return ROLE_LABELS[role] || role; }
+
+// ---- 리뷰 유형별 문구 (리뷰목록 '유형'. 기본 '인턴전환' = 기존 문구 그대로) ----
+const REVIEW_TYPE_TERMS = {
+  '수습종료': {
+    recoOptions: ['수습 통과 권고', '조건부 통과', '통과 신중', '수습 미통과 권고'],
+    matrixTitle: '수습종료 기준',
+    replace: [[/정규직 전환/g, '수습 통과'], [/미전환/g, '수습 미통과']]
+  }
+};
+const DEFAULT_ROLE_ORDER = ['현장소장', '공사책임자', '멘토', '동료'];
+function termsOf(type) { return REVIEW_TYPE_TERMS[type] || null; }
+// track: '본사'면 문항의 '현장'을 '본사'로 바꿔 표시 (건축현장 → 본사)
+function T(text, type, track) {
+  const t = termsOf(type);
+  let s = String(text == null ? '' : text);
+  if (t) t.replace.forEach(([re, to]) => { s = s.replace(re, to); });
+  if (track === '본사') s = s.replace(/건축현장/g, '본사').replace(/현장/g, '본사');
+  return s;
+}
+function recoOptionsOf(type) { const t = termsOf(type); return t ? t.recoOptions : RECOMMENDATION_OPTIONS; }
+function matrixOf(type) { const o = recoOptionsOf(type); return TRANSITION_MATRIX.map((m, i) => ({ label: o[i], desc: T(m.desc, type) })); }
+function matrixTitleOf(type) { const t = termsOf(type); return t ? t.matrixTitle : '전환기준'; }
+
+// 5개 영역 환산점수 합계 계산 (선택된 영역만 집계, 몇 개 선택됐는지도 함께 반환)
+function computeTotalScore(scores) {
+  let total = 0, scoredCount = 0;
+  RUBRIC_AREAS.forEach(area => {
+    const raw = scores[area.key];
+    const lv = area.levels.find(l => l.score === raw);
+    if (lv) { total += lv.converted; scoredCount++; }
+  });
+  return { total, scoredCount, maxCount: RUBRIC_AREAS.length };
+}
+
+
+    // ==== config.js (Apps Script 배포 URL은 여기서 수정) ====
+// Google Apps Script 웹앱 배포 후 발급되는 URL을 아래에 붙여넣으세요.
+// 예: https://script.google.com/macros/s/AKfycbx.../exec
+// 설정 방법은 README.md의 "3. Apps Script 배포" 참고
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbxVe9ulY_-ymlUjnsgvgGg3dwZZIDI9QH26Mb2bAvNasQol_ZSZUOCBLVDO238338_Y/exec'
+};
+
+// 마감 시각은 리뷰별로 Google Sheet '리뷰목록' 탭에서 관리합니다.
+
+
+
+    // ==== admin.js ====
+(function () {
+  const appEl = document.getElementById('app');
+  const topbar = document.getElementById('topbar');
+  const whoBox = document.getElementById('whoBox');
+
+  let state = {
+    token: sessionStorage.getItem('tr_admin_token') || '', // 관리자 로그인 토큰
+    view: sessionStorage.getItem('tr_admin_token') ? 'dashboard' : 'login',
+    reviews: [],
+    reviewId: (function () { try { return sessionStorage.getItem('tr_admin_review') || ''; } catch (e) { return ''; } })(),
+    review: null,
+    interns: []
+  };
+
+  function fmtDeadline(iso) {
+    if (!iso) return '-';
+    const d = new Date(iso);
+    if (isNaN(d)) return String(iso);
+    const w = ['일','월','화','수','목','금','토'][d.getDay()];
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())}(${w}) ${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+
+  function apiGet(action, params) {
+    const url = new URL(CONFIG.API_URL);
+    url.searchParams.set('action', action);
+    Object.keys(params || {}).forEach(k => url.searchParams.set(k, params[k]));
+    return fetch(url.toString()).then(r => r.json());
+  }
+
+  function apiPost(payload) {
+    return fetch(CONFIG.API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // CORS preflight 회피
+      body: JSON.stringify(payload)
+    }).then(r => r.json());
+  }
+
+  function configured() {
+    return CONFIG.API_URL && CONFIG.API_URL.indexOf('PASTE_YOUR') === -1;
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function updateTopbar() {
+    if (state.view === 'login') { topbar.style.display = 'none'; return; }
+    topbar.style.display = 'flex';
+    whoBox.innerHTML = `<button id="logoutBtn">로그아웃</button>
+      <a href="index.html" style="margin-left:10px;color:#cfd8ea;font-size:12px;">← 리뷰자 화면</a>`;
+    document.getElementById('logoutBtn').onclick = logout;
+  }
+
+  function logout() {
+    if (state.token) apiPost({ action: 'logout', token: state.token }).catch(() => {});
+    sessionStorage.removeItem('tr_admin_token');
+    sessionStorage.removeItem('tr_admin_code'); // 이전 버전 잔여값 정리
+    state = { token: '', view: 'login', reviews: [], reviewId: '', review: null, interns: [] };
+    render();
+  }
+
+  function renderLogin() {
+    appEl.innerHTML = `
+    <div class="center-wrap">
+      <div class="login-card">
+        <div class="mark">관리</div>
+        <h1>관리자 접속</h1>
+        <p class="sub">인사담당자에게 전달받은 접속 코드를 입력하세요.</p>
+        ${!configured() ? `<p class="error-msg" style="margin-bottom:14px;">⚠ 서버(Apps Script) 연결이 설정되지 않았습니다. config.js를 확인해주세요.</p>` : ''}
+        <div class="field-row" style="text-align:left;">
+          <input type="password" id="codeInput" placeholder="접속 코드" />
+        </div>
+        <button class="btn" id="loginBtn">입장</button>
+        <div class="error-msg" id="loginError"></div>
+      </div>
+    </div>`;
+    document.getElementById('loginBtn').onclick = doLogin;
+    document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  }
+
+  function doLogin() {
+    const code = document.getElementById('codeInput').value.trim();
+    const errEl = document.getElementById('loginError');
+    if (!code) { errEl.textContent = '접속 코드를 입력해주세요.'; return; }
+    apiPost({ action: 'adminLogin', code }).then(res => {
+      if (!res.ok) { errEl.textContent = res.error || '접속 코드가 올바르지 않습니다.'; return; }
+      state.token = res.token;
+      sessionStorage.setItem('tr_admin_token', res.token);
+      state.view = 'dashboard';
+      loadDashboard();
+    }).catch(() => { errEl.textContent = '서버에 연결할 수 없습니다.'; });
+  }
+
+  function loadDashboard() {
+    appEl.innerHTML = `<div class="wrap"><div class="empty-state">불러오는 중...</div></div>`;
+    updateTopbar();
+    apiGet('adminReviews', { token: state.token }).then(rv => {
+      if (!rv.ok) { logout(); return; }
+      state.reviews = rv.reviews || [];
+      if (!state.reviews.length) { state.review = null; state.interns = []; renderDashboard(); return; }
+      let sel = state.reviews.find(r => r.reviewId === state.reviewId);
+      if (!sel) sel = state.reviews.find(r => !r.closed) || state.reviews[0];
+      return selectReview(sel.reviewId, true);
+    }).catch(() => {
+      appEl.innerHTML = `<div class="wrap"><div class="empty-state">서버에 연결할 수 없습니다. 새로고침(Ctrl+Shift+R) 해주세요.</div></div>`;
+    });
+  }
+
+  function selectReview(id, silent) {
+    state.reviewId = id;
+    try { sessionStorage.setItem('tr_admin_review', id); } catch (e) {}
+    return apiGet('adminData', { token: state.token, reviewId: id }).then(res => {
+      if (!res.ok) { logout(); return; }
+      state.review = res.review;
+      state.interns = res.interns;
+      renderDashboard();
+    });
+  }
+
+  function renderReviewTree() {
+    if (!state.reviews.length) return '<div class="card"><div class="empty-state">등록된 리뷰가 없습니다. Google Sheet의 \'리뷰목록\' 탭에 리뷰를 추가해주세요.</div></div>';
+    const years = {};
+    state.reviews.forEach(r => { (years[r.year] = years[r.year] || []).push(r); });
+    const ys = Object.keys(years).sort((a, b) => b - a);
+    const selYear = state.review ? String(state.review.year) : ys[0];
+    return `<div class="card" style="margin-bottom:16px;">
+      <div class="section-title">리뷰 선택</div>
+      ${ys.map(y => `
+      <details ${String(y) === selYear ? 'open' : ''} style="margin-bottom:6px;">
+        <summary style="cursor:pointer;font-weight:700;padding:6px 0;">${escapeHtml(y)}년 <span style="font-weight:400;color:var(--muted);font-size:12px;">(${years[y].length}개)</span></summary>
+        <div style="padding-left:12px;">
+        ${years[y].map(r => `
+          <div class="rv-item" data-rid="${escapeHtml(r.reviewId)}" style="cursor:pointer;padding:8px 10px;margin:4px 0;border:1px solid ${r.reviewId === state.reviewId ? 'var(--navy, #1f3a6e)' : '#dfe3ea'};background:${r.reviewId === state.reviewId ? '#eef3fb' : '#fff'};border-radius:8px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <span><strong>${escapeHtml(r.reviewTitle)}</strong> <span class="progress-pill ${r.closed ? 'zero' : 'full'}">${r.closed ? '마감' : '진행 중'}</span></span>
+            <span style="font-size:12px;color:var(--muted);">${r.doneSlots} / ${r.totalSlots} 제출 · 마감 ${escapeHtml(fmtDeadline(r.deadline))}</span>
+          </div>`).join('')}
+        </div>
+      </details>`).join('')}
+    </div>`;
+  }
+
+  function renderDashboard() {
+    if (!state.review) {
+      appEl.innerHTML = `<div class="wrap">${renderReviewTree()}${renderOtpTool()}</div>`;
+      bindOtpTool();
+      return;
+    }
+    const total = state.interns.length;
+    const fullyDone = state.interns.filter(i => i.doneCount === i.total).length;
+    const totalSlots = state.interns.reduce((s, i) => s + i.total, 0);
+    const doneSlots = state.interns.reduce((s, i) => s + i.doneCount, 0);
+
+    appEl.innerHTML = `
+    <div class="wrap">
+      <div class="toolbar">
+        <div class="hello">${escapeHtml(state.review.reviewTitle)} <span style="font-size:12.5px;font-weight:400;color:var(--muted);">마감 ${escapeHtml(fmtDeadline(state.review.deadline))}${state.review.closed ? ' · 마감됨' : ''}</span></div>
+        <div class="actions">
+          <button class="btn secondary small" id="refreshBtn">새로고침</button>
+          <button class="btn secondary small" id="exportBtn">엑셀 다운로드</button>
+          <button class="btn secondary small" id="bulkPdfBtn">리포트 일괄 PDF 다운로드</button>
+        </div>
+      </div>
+      <div style="font-size:12.5px;color:var(--muted);text-align:right;margin-bottom:10px;display:none;" id="bulkPdfProgress"></div>
+      ${renderReviewTree()}
+      <div class="stat-row">
+        <div class="stat-box"><div class="num">${total}</div><div class="lbl">전체 피리뷰자</div></div>
+        <div class="stat-box"><div class="num">${fullyDone}</div><div class="lbl">배정 리뷰 모두 완료</div></div>
+        <div class="stat-box"><div class="num">${doneSlots} / ${totalSlots}</div><div class="lbl">전체 제출 건수</div></div>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>피리뷰자</th><th>배치현장/소속</th><th>진행률</th><th>리뷰자별 제출 현황</th><th></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      ${renderOtpTool()}
+    </div>`;
+
+    document.getElementById('bulkPdfBtn').onclick = downloadAllReportsZip;
+    document.getElementById('refreshBtn').onclick = loadDashboard;
+    document.getElementById('exportBtn').onclick = exportExcel;
+    bindOtpTool();
+    appEl.querySelectorAll('.rv-item').forEach(el => {
+      el.onclick = () => {
+        if (el.dataset.rid === state.reviewId) return;
+        appEl.innerHTML = `<div class="wrap"><div class="empty-state">불러오는 중...</div></div>`;
+        selectReview(el.dataset.rid);
+      };
+    });
+
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = state.interns.map(intern => {
+      const pct = intern.doneCount === intern.total ? 'full' : (intern.doneCount === 0 ? 'zero' : 'partial');
+      return `
+      <tr>
+        <td><strong>${escapeHtml(intern.intern)}</strong></td>
+        <td>${escapeHtml(intern.site || '')}</td>
+        <td><span class="progress-pill ${pct}">${intern.doneCount} / ${intern.total}</span></td>
+        <td>${intern.roles.map(r => `<span class="role-chip ${r.submitted ? 'on' : ''}">${escapeHtml(roleLabel(r.role))}${r.submitted ? ' ✓' : ''}</span>`).join('')}</td>
+        <td><button class="btn secondary small" data-intern="${escapeHtml(intern.intern)}">리포트 보기</button></td>
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('button[data-intern]').forEach(btn => {
+      btn.onclick = () => {
+        window.location.href = `report.html?intern=${encodeURIComponent(btn.dataset.intern)}&review=${encodeURIComponent(state.reviewId)}`;
+      };
+    });
+  }
+
+  // ---------- 리포트 HTML 조립 (report.html의 로직을 재사용, PDF 일괄생성용) ----------
+  let RCTX = { type: '', track: '현장' }; // 리포트 문구용 (리뷰 유형, 현장/본사)
+  let REPORT_ROLE_ORDER = DEFAULT_ROLE_ORDER.slice(); // 리포트 대상의 실제 리뷰자 역할 (렌더 시 갱신)
+
+  function reportByRole(records, role) {
+    return records.find(r => r['역할'] === role) || null;
+  }
+
+  function reportConvertedScore(area, rawScore) {
+    const lv = area.levels.find(l => l.score === Number(rawScore));
+    return lv ? lv.converted : null;
+  }
+
+  function reportScoreTable(records) {
+    let totalByRole = {};
+    REPORT_ROLE_ORDER.forEach(r => totalByRole[r] = 0);
+    let grandAvgSum = 0;
+    let rows = RUBRIC_AREAS.map(area => {
+      const scoreField = AREA_FIELD_MAP.find(m => m[0] === area.key)[1];
+      const convertedByRole = REPORT_ROLE_ORDER.map(role => {
+        const rec = reportByRole(records, role);
+        const raw = rec ? rec[scoreField] : '';
+        const conv = raw ? reportConvertedScore(area, raw) : null;
+        if (conv !== null) totalByRole[role] += conv;
+        return conv;
+      });
+      const cells = convertedByRole.map(conv => `<td>${conv !== null ? conv + '점' : '-'}</td>`);
+      const validConv = convertedByRole.filter(c => c !== null);
+      const avg = validConv.length ? (validConv.reduce((a, b) => a + b, 0) / validConv.length) : null;
+      if (avg !== null) grandAvgSum += avg;
+      return `<tr>
+        <td class="text-cell"><strong>${area.no} ${escapeHtml(T(area.title, RCTX.type, RCTX.track))}</strong><br><span style="color:#6b7484;">배점 ${area.maxPoints}점</span></td>
+        ${cells.join('')}
+        <td><strong>${avg !== null ? avg.toFixed(1) + '점' : '-'}</strong></td>
+      </tr>`;
+    }).join('');
+    const totalRow = `<tr style="background:#f5f6f8;">
+      <td class="text-cell"><strong>합계 (100점 만점)</strong></td>
+      ${REPORT_ROLE_ORDER.map(role => `<td><strong>${totalByRole[role] || '-'}</strong></td>`).join('')}
+      <td><strong>${grandAvgSum ? grandAvgSum.toFixed(1) + '점' : '-'}</strong></td>
+    </tr>`;
+    return `
+    <table class="report-table">
+      <thead><tr><th style="text-align:left;">리뷰영역</th>${REPORT_ROLE_ORDER.map(r => `<th>${roleLabel(r)}</th>`).join('')}<th>평균(환산)</th></tr></thead>
+      <tbody>${rows}${totalRow}</tbody>
+    </table>`;
+  }
+
+  function reportNotesBlock(records) {
+    return RUBRIC_AREAS.map(area => {
+      const noteField = AREA_FIELD_MAP.find(m => m[0] === area.key)[2];
+      const items = REPORT_ROLE_ORDER.map(role => {
+        const rec = reportByRole(records, role);
+        const note = rec ? rec[noteField] : '';
+        if (!note) return '';
+        return `<div style="margin-bottom:4px;"><strong>${roleLabel(role)}</strong>: ${escapeHtml(note)}</div>`;
+      }).filter(Boolean).join('');
+      if (!items) return '';
+      return `<div style="margin-bottom:8px;"><div style="font-weight:700;font-size:12.5px;">${area.no} ${escapeHtml(T(area.title, RCTX.type, RCTX.track))} 근거</div>${items}</div>`;
+    }).join('');
+  }
+
+  function reportRiskBlock(records) {
+    const rows = [];
+    RISK_ITEMS.forEach((item, idx) => {
+      REPORT_ROLE_ORDER.forEach(role => {
+        const rec = reportByRole(records, role);
+        if (!rec) return;
+        const risk = rec['위험요인_JSON'] || {};
+        const entry = risk[idx];
+        if (entry && entry.level && entry.level !== '해당없음') {
+          rows.push(`<tr><td>${escapeHtml(T(item, RCTX.type, RCTX.track))}</td><td>${roleLabel(role)}</td><td>${entry.level}</td><td class="text-cell">${escapeHtml(entry.detail || '')}</td></tr>`);
+        }
+      });
+    });
+    if (!rows.length) return `<p style="font-size:13px;color:#1e8a5f;">체크된 위험요인이 없습니다.</p>`;
+    return `
+    <table class="report-table">
+      <thead><tr><th>위험요인</th><th>리뷰자</th><th>단계</th><th style="text-align:left;">구체적 사실</th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>`;
+  }
+
+  function reportOpinionsBlock(records) {
+    return REPORT_ROLE_ORDER.map(role => {
+      const rec = reportByRole(records, role);
+      if (!rec) return `<div class="report-grid" style="margin-bottom:10px;"><div><span class="k">${roleLabel(role)}</span> 미제출</div></div>`;
+      return `
+      <div style="margin-bottom:12px;">
+        <div style="font-weight:700;font-size:13px;">${roleLabel(role)} (${escapeHtml(rec['평가자명'])})</div>
+        <div style="font-size:12.5px;color:#40495a;margin:4px 0;">${escapeHtml(rec['종합의견'] || '')}</div>
+        <div class="badge role">추천의견: ${escapeHtml(rec['평가자추천의견'] || '-')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function buildReportInnerHtml(data) {
+    const records = data.records;
+    const rtype = (data.review && data.review.reviewType) || '';
+    RCTX = { type: rtype, track: data.track || '현장' };
+    REPORT_ROLE_ORDER = (data.roles && data.roles.length) ? data.roles : DEFAULT_ROLE_ORDER.slice();
+    return `
+      <h1>${escapeHtml((data.review && data.review.reviewTitle) || '역량리뷰')} 리포트</h1>
+      <div class="sub">${REPORT_ROLE_ORDER.length}개 리뷰주체(${REPORT_ROLE_ORDER.map(roleLabel).join('/')}) 종합</div>
+      <div class="report-grid">
+        <div><span class="k">성명</span><strong>${escapeHtml(data.intern)}</strong></div>
+        <div><span class="k">${RCTX.track === '본사' ? '소속' : '배치현장'}</span>${escapeHtml(data.site || '')}</div>
+        <div><span class="k">제출 현황</span>${records.length} / ${REPORT_ROLE_ORDER.length}명</div>
+      </div>
+      <div class="report-section-title">역량리뷰 (100점 만점)</div>
+      ${reportScoreTable(records)}
+      <div class="report-section-title">영역별 근거 / 구체적 사례</div>
+      <div style="font-size:12.5px;">${reportNotesBlock(records) || '<p style="color:#6b7484;">기재된 근거가 없습니다.</p>'}</div>
+      <div class="report-section-title">위험요인 체크리스트</div>
+      ${reportRiskBlock(records)}
+      <div class="report-section-title">리뷰자별 종합의견 및 추천</div>
+      ${reportOpinionsBlock(records)}
+      <div class="report-section-title">${matrixTitleOf(rtype)} 매트릭스 (참고)</div>
+      <table class="report-table">
+        <thead><tr><th>구분</th><th style="text-align:left;">기준</th></tr></thead>
+        <tbody>
+        ${matrixOf(rtype).map(m => `<tr><td><strong>${m.label}</strong></td><td class="text-cell">${escapeHtml(m.desc)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+      <p style="font-size:11.5px;color:#6b7484;">허위보고, 무단결근, 부적절한 언행, 피드백 후 동일 문제 반복 등은 총점과 관계없이 ${T('미전환', rtype)}을 검토할 수 있습니다. 최종 판정은 ${REPORT_ROLE_ORDER.length}개 리뷰주체 의견을 종합하여 인사부서 협의로 확정합니다.</p>`;
+  }
+
+  // ---------- 전체 리포트 일괄 PDF(zip) 다운로드 ----------
+  function downloadAllReportsZip() {
+    const targets = state.interns.filter(i => i.doneCount > 0);
+    if (!targets.length) { alert('제출된 리뷰가 있는 피리뷰자가 없습니다.'); return; }
+
+    const btn = document.getElementById('bulkPdfBtn');
+    const progressEl = document.getElementById('bulkPdfProgress');
+    btn.disabled = true;
+    progressEl.style.display = 'block';
+    progressEl.textContent = '준비 중...';
+
+    const holder = document.createElement('div');
+    holder.style.position = 'fixed';
+    holder.style.left = '-9999px';
+    holder.style.top = '0';
+    holder.style.width = '820px';
+    holder.className = 'report-page';
+    document.body.appendChild(holder);
+
+    const zip = new JSZip();
+    const { jsPDF } = window.jspdf;
+
+    let idx = 0;
+    function next() {
+      if (idx >= targets.length) {
+        document.body.removeChild(holder);
+        progressEl.textContent = '압축 중...';
+        zip.generateAsync({ type: 'blob' }).then(blob => {
+          const a = document.createElement('a');
+          const ts = new Date().toISOString().slice(0, 10);
+          a.href = URL.createObjectURL(blob);
+          a.download = `${safeName((state.review && state.review.reviewTitle) || '리뷰')}_리포트_전체_${ts}.zip`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          btn.disabled = false;
+          progressEl.style.display = 'none';
+        });
+        return;
+      }
+      const intern = targets[idx].intern;
+      progressEl.textContent = `리포트 생성 중... (${idx + 1}/${targets.length}) ${intern}`;
+      apiGet('report', { token: state.token, intern, reviewId: state.reviewId }).then(res => {
+        if (!res.ok) { idx++; next(); return; }
+        holder.innerHTML = buildReportInnerHtml(res);
+        html2canvas(holder, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/jpeg', 0.92);
+          const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
+          pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+          const pdfBlob = pdf.output('blob');
+          zip.file(`${intern}_리뷰리포트.pdf`, pdfBlob);
+          idx++;
+          next();
+        }).catch(() => { idx++; next(); });
+      }).catch(() => { idx++; next(); });
+    }
+    next();
+  }
+
+  function safeName(t) { return String(t).replace(/[\\/:*?"<>|]/g, '').trim(); }
+
+  function exportExcel() {
+    apiGet('adminAllRecords', { token: state.token, reviewId: state.reviewId }).then(res => {
+      if (!res.ok) { alert(res.error || '내보내기에 실패했습니다.'); return; }
+      const records = res.records;
+      if (!records.length) { alert('아직 제출된 리뷰가 없습니다.'); return; }
+      const rows = records.map(r => {
+        let risk = {};
+        try { risk = JSON.parse(r['위험요인_JSON'] || '{}'); } catch (e) {}
+        const flagged = Object.keys(risk).filter(i => risk[i] && risk[i].level && risk[i].level !== '해당없음');
+        const riskSummary = flagged.map(i => `${RISK_ITEMS[i]}(${risk[i].level})`).join('; ');
+
+        const row = {
+          '리뷰명': r['리뷰명'] || (state.review && state.review.reviewTitle) || '',
+          '제출시각': r['제출시각'],
+          '사번': r['사번'],
+          '리뷰자명': r['평가자명'],
+          '역할': roleLabel(r['역할']),
+          '피리뷰자': r['피평가자']
+        };
+        let total = 0;
+        AREA_FIELD_MAP.forEach(([key, scoreField, noteField], idx) => {
+          const area = RUBRIC_AREAS[idx];
+          const raw = Number(r[scoreField]);
+          const lv = area.levels.find(l => l.score === raw);
+          const conv = lv ? lv.converted : '';
+          if (lv) total += lv.converted;
+          row[`${area.no}${area.title}_환산점수`] = conv;
+          row[`${area.no}${area.title}_근거`] = r[noteField] || '';
+        });
+        row['합계(100점만점)'] = total;
+        row['위험요인_요약'] = riskSummary;
+        row['종합의견'] = r['종합의견'] || '';
+        row['리뷰자추천의견'] = r['평가자추천의견'] || '';
+        return row;
+      });
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '리뷰결과(환산)');
+      const ts = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `${safeName((state.review && state.review.reviewTitle) || '리뷰')}_결과_${ts}.xlsx`);
+    });
+  }
+
+  function renderOtpTool() {
+    return `
+    <div class="card" style="margin-top:24px;">
+      <div class="section-title">테스트용 인증번호 발급</div>
+      <div class="page-desc" style="margin-bottom:10px;">리뷰자 사번을 넣고 발급하면, <strong>해당 리뷰자에게는 메일이 가지 않고</strong> 여기 화면에만 인증번호가 표시됩니다. 발급 후 리뷰자 사이트(index.html) 로그인 화면 하단의 <strong>"관리자에게 받은 인증번호가 있으신가요?"</strong> 링크를 눌러 사번+인증번호를 바로 입력하면 로그인됩니다. (10분간 유효)</div>
+      <div style="display:flex;gap:8px;max-width:360px;">
+        <input type="text" id="otpTestSabun" placeholder="사번 입력" style="flex:1;" inputmode="numeric" />
+        <button class="btn secondary small" id="otpTestBtn">발급</button>
+      </div>
+      <div id="otpTestResult" style="margin-top:10px;font-size:13px;"></div>
+    </div>`;
+  }
+
+  function bindOtpTool() {
+    const btn = document.getElementById('otpTestBtn');
+    if (!btn) return;
+    btn.onclick = () => {
+      const sabun = document.getElementById('otpTestSabun').value.trim();
+      const resultEl = document.getElementById('otpTestResult');
+      resultEl.textContent = '';
+      if (!sabun) { resultEl.innerHTML = '<span style="color:var(--bad);">사번을 입력해주세요.</span>'; return; }
+      apiGet('adminIssueOtp', { token: state.token, sabun }).then(res => {
+        if (!res.ok) { resultEl.innerHTML = `<span style="color:var(--bad);">${escapeHtml(res.error || '발급 실패')}</span>`; return; }
+        resultEl.innerHTML = `<strong>${escapeHtml(res.name)}</strong>님 인증번호: <span style="font-size:18px;font-weight:800;color:var(--navy);letter-spacing:2px;">${escapeHtml(res.otp)}</span> <span style="color:var(--muted);">(10분간 유효, 메일 발송 없음)</span>`;
+      });
+    };
+  }
+
+  function render() {
+    updateTopbar();
+    if (state.view === 'login') renderLogin();
+    else loadDashboard();
+  }
+
+  render();
+})();
+
+</script>
+</body>
+</html>
